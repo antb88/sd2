@@ -1,3 +1,4 @@
+import com.google.common.collect.Lists;
 import cs.technion.ac.il.sd.library.GraphUtils;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.event.TraversalListener;
@@ -154,17 +155,13 @@ public class GraphUtilsTest {
 
     @Test
     public void smallGraphReturnsValidSort() {
-
-        List<Integer> topoSort = new LinkedList<>();
         Optional<Iterator<Integer>> t = toposort(smallGraph);
         Assert.assertTrue(t.isPresent());
-        t.get().forEachRemaining(topoSort::add);
+        List<Integer> topoSort = Lists.newArrayList(t.get());
         boolean sortValid = topoSort.equals(Arrays.asList(1, 2, 3, 4))
                 || topoSort.equals(Arrays.asList(1, 3, 2, 4));
 
-        t = toposort(smallGraph);
-        Assert.assertTrue(t.isPresent());
-        Assert.assertTrue(toposortInvariant(smallGraph, t.get()));
+        Assert.assertTrue(toposortInvariant(smallGraph, topoSort.iterator()));
         Assert.assertTrue(sortValid);
     }
 
@@ -221,8 +218,8 @@ public class GraphUtilsTest {
     @Test
     public void dfsIterationFromRootOnBinaryTreeIsCorrect()
     {
-        ArrayList<Integer> verteicesList = new ArrayList<>();
-        GraphUtils.DFSTraverseSingleComponent(binaryTree, Optional.of(-1), traversalListenerMock).forEachRemaining(verteicesList::add);
+        Iterator<Integer> t = GraphUtils.DFSTraverseSingleComponent(binaryTree, Optional.of(-1), traversalListenerMock);
+        ArrayList<Integer> verteicesList = Lists.newArrayList(t);
         boolean dfsIterationCorrect = verteicesList.equals(Arrays.asList(-1,0,2,4,6,8,1, 3, 5, 7, 9))
                                         || verteicesList.equals(Arrays.asList(-1,1, 3, 5, 7, 9, 0,2,4,6,8));
         Assert.assertTrue(dfsIterationCorrect);

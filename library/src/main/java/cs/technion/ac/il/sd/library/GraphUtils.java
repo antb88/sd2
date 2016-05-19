@@ -1,5 +1,6 @@
 package cs.technion.ac.il.sd.library;
 
+import com.google.common.collect.Sets;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.alg.CycleDetector;
 import org.jgrapht.event.TraversalListener;
@@ -7,7 +8,6 @@ import org.jgrapht.traverse.BreadthFirstIterator;
 import org.jgrapht.traverse.DepthFirstIterator;
 import org.jgrapht.traverse.TopologicalOrderIterator;
 
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Optional;
 import java.util.Set;
@@ -168,9 +168,7 @@ public class GraphUtils {
      * @throws IllegalArgumentException if the graph does not contain the specified start vertex
      */
     public static <V, E> Set<V> getAllReachableVerticesFromSource(DirectedGraph<V, E> graph, V source) {
-        Set<V> reachable = new HashSet<>();
-        DFSTraverseSingleComponent(graph, Optional.of(source)).forEachRemaining(reachable::add);
-        return reachable;
+        return Sets.newHashSet(DFSTraverseSingleComponent(graph, Optional.of(source)));
     }
 
 }
