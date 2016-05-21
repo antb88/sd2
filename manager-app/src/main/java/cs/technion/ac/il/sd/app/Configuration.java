@@ -97,4 +97,15 @@ public class Configuration {
         return this;
     }
 
+    public int getCpus() {
+        return cpus;
+    }
+
+    public int getMemory() {
+        return memory;
+    }
+
+    public int getDisks() {
+        return disks;
+    }
 }
