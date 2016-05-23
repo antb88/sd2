@@ -1,7 +1,7 @@
 package cs.technion.ac.il.sd.app;
 
 /**
- * Created by ant on 5/21/16.
+ * Represents a runnable Task
  */
 public class Task {
 
@@ -28,6 +28,22 @@ public class Task {
         this.memory = memory;
         this.disks = disks;
         this.priority = priority;
+    }
+
+    public int getCpu() {
+        return cpu;
+    }
+
+    public int getMemory() {
+        return memory;
+    }
+
+    public int getDisks() {
+        return disks;
+    }
+
+    public int getPriority() {
+        return priority;
     }
 
     public String getName() {

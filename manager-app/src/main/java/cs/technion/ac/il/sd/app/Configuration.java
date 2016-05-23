@@ -74,12 +74,17 @@ public class Configuration {
                 .stream()
                 .collect(Collectors.toSet());
     }
-
-    public Set<Task> getDepenciesOf(Task task) {
-        return nameToDepNames.get(task.getName())
+    public Set<Task> getDependenciesOf(String taskName) {
+        return nameToDepNames.get(taskName)
                 .stream()
                 .map(nameToTask::get)
                 .collect(Collectors.toSet());
+    }
+
+
+
+    public Set<Task> getDependenciesOf(Task task) {
+        return getDependenciesOf(task.getName());
     }
 
     private Configuration setCpus(int cpus) {
@@ -92,7 +97,7 @@ public class Configuration {
         return this;
     }
 
-    public Configuration setDisks(int disks) {
+    private Configuration setDisks(int disks) {
         this.disks = disks;
         return this;
     }
