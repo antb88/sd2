@@ -18,7 +18,10 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 
 public class ExampleTest {
-  private final ExternalManager mock = mock(ExternalManager.class);
+  private final ExternalManager mock = spy(new ExternalManager() {
+    @Override
+    public void fail() {}
+  });
   private final Injector injector = Guice.createInjector(new ManagerModule(), new AbstractModule() {
     @Override
     protected void configure() {
@@ -60,7 +63,7 @@ public class ExampleTest {
   @Test
   public void testDep() throws Exception {
     class Context {
-      boolean aHasFinished = true;
+      boolean aHasFinished = false;
     }
     Context context = new Context();
     Mockito.doAnswer(e -> {
@@ -72,6 +75,7 @@ public class ExampleTest {
     Mockito.doAnswer(e -> {
       if (!context.aHasFinished)
         throw new IllegalStateException("a hasn't finished yet");
+      e.callRealMethod();
       return null;
     }).when(mock).run(eq("b"), eq(1), eq(0), eq(0), any(Runnable.class));
     processFile("callback");
@@ -91,7 +95,7 @@ public class ExampleTest {
     processFile("parallel");
     Thread.sleep(1500);
     for (int i = 0; i < 10; i++)
-      ignoringCallback(verify(mock)).run(String.valueOf('a' + i), 1, 1, 1);
+      ignoringCallback(verify(mock)).run(String.valueOf((char)('a' + i)), 1, 1, 1);
   }
 
   @Test

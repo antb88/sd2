@@ -49,4 +49,12 @@ public class Task {
     public String getName() {
         return name;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(!(obj instanceof Task)) return false;
+        Task other = (Task)obj;
+        return name == other.name && cpu == other.cpu && memory == other.memory && disks == other.disks && priority == other.priority;
+
+    }
 }
