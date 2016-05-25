@@ -79,7 +79,7 @@ public class ManagerAppImpl implements ManagerApp {
 
     private synchronized void runIfPossible(Task task){if (isAbleRunning(task)) {run(task);}}
 
-    private void run(Task task)
+    private synchronized void run(Task task)
     {
         useResources(task);
         scheduled.add(task);
