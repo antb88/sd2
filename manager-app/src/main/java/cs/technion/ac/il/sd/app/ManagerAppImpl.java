@@ -74,10 +74,9 @@ public class ManagerAppImpl implements ManagerApp {
         readyToRun.addAll(GraphUtils.getSourcesVertices(dependencyGraph));
 
         while (complete.size() < totalTasks) {
-            scheduleAllAvailable();
+            runAvailable();
             try {
-                Task doneTask = calledBack.take();
-                onTaskDone(doneTask);
+                onTaskDone(calledBack.take());
             } catch (InterruptedException e) {
                 throw new AssertionError("interrupted while waiting for callback");
             }
@@ -93,7 +92,7 @@ public class ManagerAppImpl implements ManagerApp {
         return GraphUtils.hasCycle(dependencyGraph);
     }
 
-    private void scheduleAllAvailable() {
+    private void runAvailable() {
 
         Set<Task> newRunning = readyToRun.stream()
                 .map(this::runIfPossible)
@@ -169,7 +168,9 @@ public class ManagerAppImpl implements ManagerApp {
 
     private DirectedGraph<Task, DefaultEdge> buildGraph(Configuration configuration) {
         configuration.getTasks().forEach(dependencyGraph::addVertex);
-        configuration.getTasks().forEach(task -> configuration.getDependenciesOf(task).forEach(d -> dependencyGraph.addEdge(d, task)));
+        configuration.getTasks()
+                .forEach(task -> configuration.getDependenciesOf(task)
+                        .forEach(d -> dependencyGraph.addEdge(d, task)));
         return dependencyGraph;
     }
 }

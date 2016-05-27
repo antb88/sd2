@@ -74,14 +74,13 @@ public class Configuration {
                 .stream()
                 .collect(Collectors.toSet());
     }
+
     public Set<Task> getDependenciesOf(String taskName) {
         return nameToDepNames.get(taskName)
                 .stream()
                 .map(nameToTask::get)
                 .collect(Collectors.toSet());
     }
-
-
 
     public Set<Task> getDependenciesOf(Task task) {
         return getDependenciesOf(task.getName());

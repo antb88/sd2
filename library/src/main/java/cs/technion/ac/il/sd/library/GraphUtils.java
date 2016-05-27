@@ -11,6 +11,7 @@ import org.jgrapht.traverse.TopologicalOrderIterator;
 import java.util.Iterator;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -61,6 +62,20 @@ public class GraphUtils {
     public static <V, E> Set<V> getLeafVertices(DirectedGraph<V, E> graph) {
         return graph.vertexSet().stream()
                 .filter(v -> graph.outDegreeOf(v) == 0)
+                .collect(Collectors.toSet());
+    }
+
+    /**
+     * Returns all vertices that satisfy a given predicate, for instance :
+     * <br>
+     * {@code getVerticesThat(graph, v -> graph.outDegreeOf(v) == 0) is equivalent to getLeafVertices(graph)}
+     * @param graph the graph to operate on
+     * @param predicate predicate on vertices
+     * @return -
+     */
+    public static <V, E> Set<V> getLVerticesSuchThat(DirectedGraph<V, E> graph, Predicate<V> predicate) {
+        return graph.vertexSet().stream()
+                .filter(predicate)
                 .collect(Collectors.toSet());
     }
 
