@@ -59,7 +59,8 @@ public class ManagerAppImpl implements ManagerApp {
         readyToRun = new PriorityBlockingQueue<>(10, (t1, t2) -> t1.getPriority() < t2.getPriority() ? -1 : 1);
 
         readyToRun.addAll(GraphUtils.getSourcesVertices(dependencyGraph));
-        while (!dependencyGraph.vertexSet().isEmpty())
+        int taskNum = dependencyGraph.vertexSet().size();
+        while (scheduled.size() != taskNum)
         {
             scheduleAllAvailiable();
         }
