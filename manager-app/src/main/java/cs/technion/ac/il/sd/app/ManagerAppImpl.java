@@ -85,7 +85,7 @@ public class ManagerAppImpl implements ManagerApp {
 
     private boolean isEnoughResources(Configuration configuration) {
         return configuration.getTasks().stream()
-                .allMatch(this::isTaskAbleRunning);
+                .allMatch(this::isAbleToRun);
     }
 
     private boolean hasCircularDependency(DirectedGraph<Task, DefaultEdge> dependencyGraph) {
@@ -107,7 +107,7 @@ public class ManagerAppImpl implements ManagerApp {
     }
 
     private Optional<Task> runIfPossible(Task task) {
-        if (isTaskAbleRunning(task)) {
+        if (isAbleToRun(task)) {
             run(task);
             return Optional.of(task);
         }
@@ -155,7 +155,7 @@ public class ManagerAppImpl implements ManagerApp {
         disks += task.getDisks();
     }
 
-    private boolean isTaskAbleRunning(Task t) {
+    private boolean isAbleToRun(Task t) {
         return t.getCpu() <= cpus && t.getDisks() <= disks && t.getMemory() <= memory;
     }
 
