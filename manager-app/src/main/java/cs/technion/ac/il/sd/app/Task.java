@@ -3,7 +3,7 @@ package cs.technion.ac.il.sd.app;
 /**
  * Represents a runnable Task
  */
-public class Task {
+public class Task  implements Comparable{
 
     private final int cpu;
     private final int memory;
@@ -56,5 +56,11 @@ public class Task {
         Task other = (Task)obj;
         return name == other.name && cpu == other.cpu && memory == other.memory && disks == other.disks && priority == other.priority;
 
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        Task other = (Task) o;
+        return getPriority() < other.getPriority() ? -1 : 1;
     }
 }

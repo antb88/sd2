@@ -9,17 +9,22 @@ import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Optional;
 import java.util.Queue;
+import java.util.Set;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.PriorityBlockingQueue;
+import java.util.stream.Collectors;
 
 /**
- * Created by ant on 5/23/16.
+ * ManagerApp Implementation
  */
+
 public class ManagerAppImpl implements ManagerApp {
 
     private final ManagerFactory factory;
+
     private ExternalManager manager;
     private int cpus;
     private int memory;
@@ -27,105 +32,144 @@ public class ManagerAppImpl implements ManagerApp {
     private DirectedGraph<Task, DefaultEdge> dependencyGraph;
 
     private Queue<Task> readyToRun;
-    private List<Task> scheduled = new ArrayList<>();
+    private ArrayBlockingQueue<Task> calledBack;
+    private Set<Task> running;
+    private Set<Task> complete;
+    private int totalTasks;
+
     @Inject
     public ManagerAppImpl(ManagerFactory factory) {
         this.factory = factory;
-
+        this.readyToRun = new PriorityBlockingQueue<>();
+        this.running = ConcurrentHashMap.newKeySet();
+        this.complete = ConcurrentHashMap.newKeySet();
+        this.calledBack = new ArrayBlockingQueue<>(10);
+        this.dependencyGraph = new DefaultDirectedGraph<>(DefaultEdge.class);
     }
 
     @Override
     public void processFile(File file) {
 
         Configuration configuration = Configuration.fromFile(file);
-        dependencyGraph = buildGraphFrom(configuration);
         loadResources(configuration);
-        manager = factory.create(cpus, memory, disks);
+        buildGraph(configuration);
 
-        if (!hasCyrcularDependency(dependencyGraph) && isEnoughResources(configuration) ) {
+        if (canProcess(configuration)) {
             process();
-        }
-        else {
+        } else {
             fail();
         }
     }
 
-    private void fail() {
-        factory.create(0,0,0).fail();
+    private boolean canProcess(Configuration configuration) {
+        return isEnoughResources(configuration) && !hasCircularDependency(dependencyGraph);
     }
 
-    //TODO : work in progress
-    private void process() {
-        readyToRun = new PriorityBlockingQueue<>(10, (t1, t2) -> t1.getPriority() < t2.getPriority() ? -1 : 1);
+    private void fail() {
+        factory.create(0, 0, 0).fail();
+    }
 
+    private void process() {
+        manager = factory.create(cpus, memory, disks);
         readyToRun.addAll(GraphUtils.getSourcesVertices(dependencyGraph));
-        int taskNum = dependencyGraph.vertexSet().size();
-        while (scheduled.size() != taskNum)
-        {
-            scheduleAllAvailiable();
+
+        while (complete.size() < totalTasks) {
+            scheduleAllAvailable();
+            try {
+                Task doneTask = calledBack.take();
+                onTaskDone(doneTask);
+            } catch (InterruptedException e) {
+                throw new AssertionError("interrupted while waiting for callback");
+            }
         }
     }
 
     private boolean isEnoughResources(Configuration configuration) {
         return configuration.getTasks().stream()
-                .allMatch(this::isAbleRunning);
-
+                .allMatch(this::isTaskAbleRunning);
     }
 
-    private boolean hasCyrcularDependency(DirectedGraph<Task, DefaultEdge> dependencyGraph) {
+    private boolean hasCircularDependency(DirectedGraph<Task, DefaultEdge> dependencyGraph) {
         return GraphUtils.hasCycle(dependencyGraph);
     }
 
-    private synchronized void scheduleAllAvailiable() { //TODO - handle synchronization - currently just added synchronized to some methods
-        readyToRun.forEach(this::runIfPossible);
-        readyToRun.stream().filter(t -> scheduled.contains(t));
+    private void scheduleAllAvailable() {
+
+        Set<Task> newRunning = readyToRun.stream()
+                .map(this::runIfPossible)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toSet());
+
+        newRunning.forEach( t-> {
+            readyToRun.remove(t);
+            running.add(t);
+        });
     }
 
-    private synchronized void runIfPossible(Task task){if (isAbleRunning(task)) {run(task);}}
+    private Optional<Task> runIfPossible(Task task) {
+        if (isTaskAbleRunning(task)) {
+            run(task);
+            return Optional.of(task);
+        }
+        return Optional.empty();
+    }
 
-    private synchronized void run(Task task)
-    {
+    private void run(Task task) {
         useResources(task);
-        scheduled.add(task);
-        manager.run(task.getName(), task.getCpu(), task.getMemory(), task.getDisks(), () -> taskDone(task));
+        manager.run(task.getName(), task.getCpu(), task.getMemory(), task.getDisks(), () -> callback(task));
     }
 
-    private synchronized void taskDone(Task task)
-    {
+    private void callback(Task task) {
+        try {
+            calledBack.put(task);
+        } catch (InterruptedException e) {
+            throw new AssertionError("interrupted while posting callback");
+        }
+    }
+
+    private void onTaskDone(Task task) {
         restoreResources(task);
+        running.remove(task);
+        complete.add(task);
         dependencyGraph.removeVertex(task);
-        readyToRun.addAll(GraphUtils.getSourcesVertices(dependencyGraph));
-        scheduleAllAvailiable();
+        Set<Task> newReadyToRun = GraphUtils.getSourcesVertices(dependencyGraph)
+                .stream()
+                .filter(this::taskNotProcessed)
+                .collect(Collectors.toSet());
+        readyToRun.addAll(newReadyToRun);
     }
 
-    private void useResources(Task task)
-    {
+    private boolean taskNotProcessed(Task t) {
+        return !readyToRun.contains(t) && !running.contains(t) && !complete.contains(t);
+    }
+
+    private void useResources(Task task) {
         cpus -= task.getCpu();
         memory -= task.getMemory();
         disks -= task.getDisks();
     }
 
-    private void restoreResources(Task task)
-    {
+    private void restoreResources(Task task) {
         cpus += task.getCpu();
         memory += task.getMemory();
         disks += task.getDisks();
     }
 
-    private boolean isAbleRunning(Task t) {//TODO - added scheduled patch because synchronization not handled yet
-        return !scheduled.contains(t) && t.getCpu() <= cpus && t.getDisks() <= disks && t.getMemory() <= memory;
+    private boolean isTaskAbleRunning(Task t) {
+        return t.getCpu() <= cpus && t.getDisks() <= disks && t.getMemory() <= memory;
     }
 
     private void loadResources(Configuration configuration) {
+        totalTasks = configuration.getTasks().size();
         cpus = configuration.getCpus();
         memory = configuration.getMemory();
         disks = configuration.getDisks();
     }
 
-    private DirectedGraph<Task, DefaultEdge> buildGraphFrom(Configuration configuration) {
-        DirectedGraph<Task, DefaultEdge> g = new DefaultDirectedGraph<>(DefaultEdge.class);
-        configuration.getTasks().forEach(g::addVertex);
-        configuration.getTasks().forEach(task -> configuration.getDependenciesOf(task).forEach(d -> g.addEdge(d, task)));
-        return g;
+    private DirectedGraph<Task, DefaultEdge> buildGraph(Configuration configuration) {
+        configuration.getTasks().forEach(dependencyGraph::addVertex);
+        configuration.getTasks().forEach(task -> configuration.getDependenciesOf(task).forEach(d -> dependencyGraph.addEdge(d, task)));
+        return dependencyGraph;
     }
 }
