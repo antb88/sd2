@@ -1,5 +1,6 @@
 package cs.technion.ac.il.sd.app;
 
+import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import cs.technion.ac.il.sd.ExternalManager;
 import cs.technion.ac.il.sd.ManagerFactory;
@@ -9,12 +10,8 @@ import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 
 import java.io.File;
-import java.util.Optional;
-import java.util.Queue;
-import java.util.Set;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.PriorityBlockingQueue;
+import java.util.*;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.stream.Collectors;
 
 /**
@@ -32,7 +29,7 @@ public class ManagerAppImpl implements ManagerApp {
     private DirectedGraph<Task, DefaultEdge> dependencyGraph;
 
     private Queue<Task> readyToRun;
-    private ArrayBlockingQueue<Task> calledBack;
+    private LinkedBlockingQueue<Task> calledBack;
     private Set<Task> running;
     private Set<Task> complete;
     private int totalTasks;
@@ -40,10 +37,10 @@ public class ManagerAppImpl implements ManagerApp {
     @Inject
     public ManagerAppImpl(ManagerFactory factory) {
         this.factory = factory;
-        this.readyToRun = new PriorityBlockingQueue<>();
-        this.running = ConcurrentHashMap.newKeySet();
-        this.complete = ConcurrentHashMap.newKeySet();
-        this.calledBack = new ArrayBlockingQueue<>(10);
+        this.readyToRun = new PriorityQueue<>();
+        this.running = new HashSet<>();
+        this.complete = new HashSet<>();
+        this.calledBack = new LinkedBlockingQueue<>();
         this.dependencyGraph = new DefaultDirectedGraph<>(DefaultEdge.class);
     }
 
@@ -73,7 +70,7 @@ public class ManagerAppImpl implements ManagerApp {
         manager = factory.create(cpus, memory, disks);
         readyToRun.addAll(GraphUtils.getSourcesVertices(dependencyGraph));
 
-        while (complete.size() < totalTasks) {
+        while (!allTasksLaunched()) {
             runAvailable();
             try {
                 onTaskDone(calledBack.take());
@@ -81,6 +78,10 @@ public class ManagerAppImpl implements ManagerApp {
                 throw new AssertionError("interrupted while waiting for callback");
             }
         }
+    }
+
+    private boolean allTasksLaunched() {
+        return Sets.union(complete, running).size() == totalTasks;
     }
 
     private boolean isEnoughResources(Configuration configuration) {
