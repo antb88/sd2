@@ -1,4 +1,5 @@
 import com.google.common.collect.Lists;
+import cs.technion.ac.il.sd.library.graph.GraphTraverse;
 import cs.technion.ac.il.sd.library.graph.GraphUtils;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.event.TraversalListener;
@@ -218,7 +219,7 @@ public class GraphUtilsTest {
     @Test
     public void dfsIterationFromRootOnBinaryTreeIsCorrect()
     {
-        Iterator<Integer> t = GraphUtils.DFSTraverseSingleComponent(binaryTree, Optional.of(-1), traversalListenerMock);
+        Iterator<Integer> t = GraphTraverse.DFSTraverseSingleComponent(binaryTree, Optional.of(-1), traversalListenerMock);
         ArrayList<Integer> verteicesList = Lists.newArrayList(t);
         boolean dfsIterationCorrect = verteicesList.equals(Arrays.asList(-1,0,2,4,6,8,1, 3, 5, 7, 9))
                                         || verteicesList.equals(Arrays.asList(-1,1, 3, 5, 7, 9, 0,2,4,6,8));
@@ -231,11 +232,11 @@ public class GraphUtilsTest {
     public void singleComponentDfsIterationOnBinaryTreeIsCorrect()
     {
         ArrayList<Integer> singleComponentverteicesList = new ArrayList<>();
-        GraphUtils.DFSTraverseSingleComponent(binaryTree, Optional.of(2)).forEachRemaining(singleComponentverteicesList::add);
+        GraphTraverse.DFSTraverseSingleComponent(binaryTree, Optional.of(2)).forEachRemaining(singleComponentverteicesList::add);
         Assert.assertEquals(singleComponentverteicesList,Arrays.asList(2,4,6,8));
         singleComponentverteicesList.clear();
 
-        GraphUtils.DFSTraverseSingleComponent(binaryTree, Optional.of(1)).forEachRemaining(singleComponentverteicesList::add);
+        GraphTraverse.DFSTraverseSingleComponent(binaryTree, Optional.of(1)).forEachRemaining(singleComponentverteicesList::add);
         Assert.assertEquals(singleComponentverteicesList,Arrays.asList(1, 3, 5, 7, 9));
     }
 
@@ -247,7 +248,7 @@ public class GraphUtilsTest {
     public void crossComponentDfsIterationOnBinaryTreeIsCorrect()
     {
         ArrayList<Integer> crossComponentverteicesList = new ArrayList<>();
-        GraphUtils.DFSTraverseCrossComponent(binaryTree, Optional.of(2)).forEachRemaining(crossComponentverteicesList::add);
+        GraphTraverse.DFSTraverseCrossComponent(binaryTree, Optional.of(2)).forEachRemaining(crossComponentverteicesList::add);
         boolean crossComponentIterationCorrect = crossComponentverteicesList.equals(Arrays.asList(2,4,6,8,-1,0,1, 3, 5, 7, 9))
                 || crossComponentverteicesList.equals(Arrays.asList(2, 4, 6, 8, -1, 1, 3, 5, 7, 9, 0)); //there are more valid options that are not tested here
         Assert.assertTrue(crossComponentIterationCorrect);
@@ -256,7 +257,7 @@ public class GraphUtilsTest {
     public void dfsOnCyclicGraphTraveresEachVertexOnce()
     {
         ArrayList<Integer> verteicesList = new ArrayList<>();
-        GraphUtils.DFSTraverseSingleComponent(cyclicGraph, Optional.of(1)).forEachRemaining(verteicesList::add);
+        GraphTraverse.DFSTraverseSingleComponent(cyclicGraph, Optional.of(1)).forEachRemaining(verteicesList::add);
         boolean dfsIterationCorrect = verteicesList.equals(Arrays.asList(1,2,3,4))
                 || verteicesList.equals(Arrays.asList(1,3, 4, 2));
         Assert.assertTrue(dfsIterationCorrect);
@@ -264,14 +265,14 @@ public class GraphUtilsTest {
     @Test
     public void dfsOnEmptyGraphReturnsEmptyIterator()
     {
-        Assert.assertFalse(GraphUtils.DFSTraverseSingleComponent(emptyGraph, Optional.empty()).hasNext());
-        Assert.assertFalse(GraphUtils.DFSTraverseCrossComponent(emptyGraph, Optional.empty()).hasNext());
+        Assert.assertFalse(GraphTraverse.DFSTraverseSingleComponent(emptyGraph, Optional.empty()).hasNext());
+        Assert.assertFalse(GraphTraverse.DFSTraverseCrossComponent(emptyGraph, Optional.empty()).hasNext());
     }
     @Test
     public void dfsOnAbsentStartVertexThrowsException()
     {
         thrown.expect(IllegalArgumentException.class);
-        GraphUtils.DFSTraverseSingleComponent(cyclicGraph, Optional.of(0));
+        GraphTraverse.DFSTraverseSingleComponent(cyclicGraph, Optional.of(0));
     }
     @Test
     public void emptyStartVertexDfsOnArbitraryVertex()
@@ -279,11 +280,11 @@ public class GraphUtilsTest {
         ArrayList<Integer> verteicesList = new ArrayList<>();
         DirectedGraph<Integer, DefaultEdge> g = new DefaultDirectedGraph<>(DefaultEdge.class);
         for(int i = 0; i<3 ;i++){g.addVertex(i);}
-        GraphUtils.DFSTraverseSingleComponent(g, Optional.empty()).forEachRemaining(verteicesList::add);
+        GraphTraverse.DFSTraverseSingleComponent(g, Optional.empty()).forEachRemaining(verteicesList::add);
         Assert.assertTrue(verteicesList.equals(Collections.singletonList(0)) || verteicesList.equals(Collections.singletonList(1)) || verteicesList.equals(Collections.singletonList(2)));
 
         verteicesList.clear();
-        GraphUtils.DFSTraverseCrossComponent(g, Optional.empty()).forEachRemaining(verteicesList::add);
+        GraphTraverse.DFSTraverseCrossComponent(g, Optional.empty()).forEachRemaining(verteicesList::add);
         Assert.assertEquals(verteicesList.stream().collect(Collectors.toSet()), Arrays.asList(0,1,2).stream().collect(Collectors.toSet()));
     }
 
@@ -293,7 +294,7 @@ public class GraphUtilsTest {
     public void bfsIterationFromRootOnBinaryTreeIsCorrect()
     {
         ArrayList<Integer> verteicesList = new ArrayList<>();
-        GraphUtils.BFSTraverseSingleComponent(binaryTree, Optional.of(-1), traversalListenerMock).forEachRemaining(verteicesList::add);
+        GraphTraverse.BFSTraverseSingleComponent(binaryTree, Optional.of(-1), traversalListenerMock).forEachRemaining(verteicesList::add);
         boolean bfsIterationCorrect = verteicesList.equals(Arrays.asList(-1,0,1,2,3,4,5, 6, 7, 8, 9))
                 || verteicesList.equals(Arrays.asList(-1,1,0,3,2,5,4, 7, 6, 9, 8));
         Assert.assertTrue(bfsIterationCorrect);
@@ -305,11 +306,11 @@ public class GraphUtilsTest {
     public void singleComponentBfsIterationOnBinaryTreeIsCorrect()
     {
         ArrayList<Integer> singleComponentverteicesList = new ArrayList<>();
-        GraphUtils.BFSTraverseSingleComponent(binaryTree, Optional.of(2)).forEachRemaining(singleComponentverteicesList::add);
+        GraphTraverse.BFSTraverseSingleComponent(binaryTree, Optional.of(2)).forEachRemaining(singleComponentverteicesList::add);
         Assert.assertEquals(singleComponentverteicesList,Arrays.asList(2,4,6,8));
         singleComponentverteicesList.clear();
 
-        GraphUtils.BFSTraverseSingleComponent(binaryTree, Optional.of(1)).forEachRemaining(singleComponentverteicesList::add);
+        GraphTraverse.BFSTraverseSingleComponent(binaryTree, Optional.of(1)).forEachRemaining(singleComponentverteicesList::add);
         Assert.assertEquals(singleComponentverteicesList,Arrays.asList(1, 3, 5, 7, 9));
     }
 
@@ -320,7 +321,7 @@ public class GraphUtilsTest {
     public void crossComponentBfsIterationOnBinaryTreeIsCorrect()
     {
         ArrayList<Integer> crossComponentverteicesList = new ArrayList<>();
-        GraphUtils.BFSTraverseCrossComponent(binaryTree, Optional.of(2)).forEachRemaining(crossComponentverteicesList::add);
+        GraphTraverse.BFSTraverseCrossComponent(binaryTree, Optional.of(2)).forEachRemaining(crossComponentverteicesList::add);
         boolean crossComponentIterationCorrect = crossComponentverteicesList.equals(Arrays.asList(2,4,6,8,-1,0,1, 3, 5, 7, 9)); //there are more valid options that are not tested here
         Assert.assertTrue(crossComponentIterationCorrect);
     }
@@ -330,7 +331,7 @@ public class GraphUtilsTest {
     public void bfsOnCyclicGraphTraveresEachVertexOnce()
     {
         ArrayList<Integer> verteicesList = new ArrayList<>();
-        GraphUtils.BFSTraverseSingleComponent(cyclicGraph, Optional.of(1)).forEachRemaining(verteicesList::add);
+        GraphTraverse.BFSTraverseSingleComponent(cyclicGraph, Optional.of(1)).forEachRemaining(verteicesList::add);
         boolean dfsIterationCorrect = verteicesList.equals(Arrays.asList(1,2,3,4))
                 || verteicesList.equals(Arrays.asList(1,3, 2, 4));
         Assert.assertTrue(dfsIterationCorrect);
@@ -339,15 +340,15 @@ public class GraphUtilsTest {
     @Test
     public void bfsOnEmptyGraphReturnsEmptyIterator()
     {
-        Assert.assertFalse(GraphUtils.BFSTraverseSingleComponent(emptyGraph, Optional.empty()).hasNext());
-        Assert.assertFalse(GraphUtils.BFSTraverseCrossComponent(emptyGraph, Optional.empty()).hasNext());
+        Assert.assertFalse(GraphTraverse.BFSTraverseSingleComponent(emptyGraph, Optional.empty()).hasNext());
+        Assert.assertFalse(GraphTraverse.BFSTraverseCrossComponent(emptyGraph, Optional.empty()).hasNext());
     }
 
     @Test
     public void bfsOnAbsentStartVertexThrowsException()
     {
         thrown.expect(IllegalArgumentException.class);
-        GraphUtils.BFSTraverseSingleComponent(cyclicGraph, Optional.of(0));
+        GraphTraverse.BFSTraverseSingleComponent(cyclicGraph, Optional.of(0));
     }
 
     @Test
@@ -357,11 +358,11 @@ public class GraphUtilsTest {
         DirectedGraph<Integer, DefaultEdge> g = new DefaultDirectedGraph<>(DefaultEdge.class);
         for(int i = 0; i<3 ;i++){g.addVertex(i);}
 
-        GraphUtils.BFSTraverseSingleComponent(g, Optional.empty()).forEachRemaining(verteicesList::add);
+        GraphTraverse.BFSTraverseSingleComponent(g, Optional.empty()).forEachRemaining(verteicesList::add);
         Assert.assertTrue(verteicesList.equals(Collections.singletonList(0)) || verteicesList.equals(Collections.singletonList(1)) || verteicesList.equals(Collections.singletonList(2)));
 
         verteicesList.clear();
-        GraphUtils.BFSTraverseCrossComponent(g, Optional.empty()).forEachRemaining(verteicesList::add);
+        GraphTraverse.BFSTraverseCrossComponent(g, Optional.empty()).forEachRemaining(verteicesList::add);
         Assert.assertEquals(verteicesList.stream().collect(Collectors.toSet()), new HashSet<>(Arrays.asList(0,1,2)));
     }
     @Test
