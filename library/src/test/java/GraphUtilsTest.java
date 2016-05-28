@@ -2,21 +2,18 @@ import com.google.common.collect.Lists;
 import cs.technion.ac.il.sd.library.graph.GraphTraverse;
 import cs.technion.ac.il.sd.library.graph.GraphUtils;
 import org.jgrapht.DirectedGraph;
-import org.jgrapht.event.TraversalListener;
 import org.jgrapht.experimental.dag.DirectedAcyclicGraph;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
-import org.junit.*;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.Timeout;
-import org.mockito.Mockito;
 
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static org.mockito.Matchers.anyObject;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 
 /**
  * Test file for {@link GraphUtils#toposort(DirectedGraph)}
@@ -32,7 +29,6 @@ public class GraphUtilsTest {
 
     private static final DirectedGraph<Integer, DefaultEdge> binaryTree = new DefaultDirectedGraph<>(DefaultEdge.class);
 
-    private static TraversalListener<Integer, DefaultEdge> traversalListenerMock;
     private <V, E> Optional<Iterator<V>> toposort(DirectedGraph<V, E> graph) {
         return GraphUtils.toposort(graph);
     }
@@ -66,10 +62,7 @@ public class GraphUtilsTest {
         return true;
     }
     @SuppressWarnings("unchecked")
-    @Before
-    public void initTraverseListenerMock() {
-        traversalListenerMock = Mockito.mock(TraversalListener.class);
-    }
+
     @Rule
     public final ExpectedException thrown = ExpectedException.none();
 
@@ -219,13 +212,11 @@ public class GraphUtilsTest {
     @Test
     public void dfsIterationFromRootOnBinaryTreeIsCorrect()
     {
-        Iterator<Integer> t = GraphTraverse.DFSTraverseSingleComponent(binaryTree, Optional.of(-1), traversalListenerMock);
+        Iterator<Integer> t = GraphTraverse.DFSTraverseSingleComponent(binaryTree, Optional.of(-1));
         ArrayList<Integer> verteicesList = Lists.newArrayList(t);
         boolean dfsIterationCorrect = verteicesList.equals(Arrays.asList(-1,0,2,4,6,8,1, 3, 5, 7, 9))
                                         || verteicesList.equals(Arrays.asList(-1,1, 3, 5, 7, 9, 0,2,4,6,8));
         Assert.assertTrue(dfsIterationCorrect);
-        Mockito.verify(traversalListenerMock, times(verteicesList.size())).vertexTraversed(anyObject());
-        Mockito.verify(traversalListenerMock, times(verteicesList.size())).vertexFinished(anyObject());
     }
 
     @Test
@@ -294,12 +285,10 @@ public class GraphUtilsTest {
     public void bfsIterationFromRootOnBinaryTreeIsCorrect()
     {
         ArrayList<Integer> verteicesList = new ArrayList<>();
-        GraphTraverse.BFSTraverseSingleComponent(binaryTree, Optional.of(-1), traversalListenerMock).forEachRemaining(verteicesList::add);
+        GraphTraverse.BFSTraverseSingleComponent(binaryTree, Optional.of(-1)).forEachRemaining(verteicesList::add);
         boolean bfsIterationCorrect = verteicesList.equals(Arrays.asList(-1,0,1,2,3,4,5, 6, 7, 8, 9))
                 || verteicesList.equals(Arrays.asList(-1,1,0,3,2,5,4, 7, 6, 9, 8));
         Assert.assertTrue(bfsIterationCorrect);
-        Mockito.verify(traversalListenerMock, times(verteicesList.size())).vertexTraversed(anyObject());
-        Mockito.verify(traversalListenerMock, never()).vertexFinished(anyObject());
     }
 
     @Test
@@ -385,9 +374,6 @@ public class GraphUtilsTest {
         Assert.assertEquals(GraphUtils.getAllReachableVerticesFromSource(complexGraph,9),
                 new HashSet<>(Collections.singletonList(9)));
     }
-
-
-    //TODO - add listener tests - how to use Mockito InOrder with listeners?
 
 
 }
