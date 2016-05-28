@@ -1,5 +1,5 @@
 import com.google.common.collect.Lists;
-import cs.technion.ac.il.sd.library.GraphUtils;
+import cs.technion.ac.il.sd.library.graph.GraphUtils;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.event.TraversalListener;
 import org.jgrapht.experimental.dag.DirectedAcyclicGraph;

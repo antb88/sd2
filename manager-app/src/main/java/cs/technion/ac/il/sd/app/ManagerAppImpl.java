@@ -4,7 +4,7 @@ import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import cs.technion.ac.il.sd.ExternalManager;
 import cs.technion.ac.il.sd.ManagerFactory;
-import cs.technion.ac.il.sd.library.GraphUtils;
+import cs.technion.ac.il.sd.library.graph.GraphUtils;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
