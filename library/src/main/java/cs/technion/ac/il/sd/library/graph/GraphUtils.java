@@ -80,7 +80,7 @@ public class GraphUtils {
      * @param predicate predicate on vertices
      * @return -
      */
-    public static <V, E> Set<V> getLVerticesSuchThat(DirectedGraph<V, E> graph, Predicate<V> predicate) {
+    public static <V, E> Set<V> getVerticesSuchThat(DirectedGraph<V, E> graph, Predicate<V> predicate) {
         return graph.vertexSet().stream()
                 .filter(predicate)
                 .collect(Collectors.toSet());
@@ -95,7 +95,7 @@ public class GraphUtils {
      * @throws IllegalArgumentException if the graph does not contain the specified start vertex
      */
     public static <V, E> Set<V> getAllReachableVerticesFromSource(DirectedGraph<V, E> graph, V source) {
-        return Sets.newHashSet(GraphTraverse.DFSTraverseSingleComponent(graph, Optional.of(source)));
+        return Sets.newHashSet(GraphTraverse.dfsSingleComponent(graph, source));
     }
 
 }
