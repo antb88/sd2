@@ -27,12 +27,17 @@ public class ManagerAppTest {
     private final ExternalManager manager = new ExternalManager() {
         @Override
         public void run(String name, int cpus, int memory, int disk, Runnable callback) {
-            try {
-                Thread.sleep(100L);
-                callback.run();
-            } catch (InterruptedException var2) {
-                var2.printStackTrace();
-            }
+            (new Thread() {
+                public void run() {
+                    try {
+                        Thread.sleep(60L);
+                        callback.run();
+                    } catch (InterruptedException var2) {
+                        var2.printStackTrace();
+                    }
+
+                }
+            }).start();
         }
 
         @Override
@@ -128,5 +133,19 @@ public class ManagerAppTest {
         processFile("circular");
         Thread.sleep(300);
         verify(mock).fail();
+    }
+
+    @Test
+    public void largeIsCorrect() throws InterruptedException
+    {
+        processFile("large");
+        InOrder order = inOrder(mock);
+        order.verify(mock).run(eq(String.valueOf(0)), eq(0), eq(0), eq(0), anyObject());
+        for(int i = 1; i < 120; i++)
+        {
+            order.verify(mock).run(eq(String.valueOf(i)), eq(1), eq(1), eq(1), anyObject());
+        }
+        order.verifyNoMoreInteractions();
+
     }
 }
