@@ -272,12 +272,20 @@ public class GraphUtilsTest {
         DirectedGraph<Integer, DefaultEdge> g = new DefaultDirectedGraph<>(DefaultEdge.class);
         for(int i = 0; i<3 ;i++){g.addVertex(i);}
         GraphTraverse.dfsSingleComponent(g, 0).forEachRemaining(verteicesList::add);
-        Assert.assertTrue(verteicesList.equals(Collections.singletonList(0)) || verteicesList.equals(Collections.singletonList(1)) || verteicesList.equals(Collections.singletonList(2)));
+        Assert.assertTrue(verteicesList.equals(Collections.singletonList(0))
+                || verteicesList.equals(Collections.singletonList(1))
+                || verteicesList.equals(Collections.singletonList(2)));
 
         verteicesList.clear();
         GraphTraverse.dfsCrossComponent(g, 0).forEachRemaining(verteicesList::add);
-        Assert.assertEquals(verteicesList.stream().collect(Collectors.toSet()), Arrays.asList(0,1,2).stream().collect(Collectors.toSet()));
+        Assert.assertEquals(new HashSet<>(verteicesList), new HashSet<>(Arrays.asList(0,1,2)));
     }
+    @Test
+    public void predicateReturnsCorrectSet() {
+        Set<Integer> inDegreeOf1 = GraphUtils.getVerticesSuchThat(smallGraph, v->smallGraph.inDegreeOf(v) == 1);
+        Assert.assertEquals(inDegreeOf1, new HashSet<>(Arrays.asList(2,3,4)));
+    }
+
 
     /************ BFS ************/
 

@@ -16,11 +16,14 @@ public class GraphTraverse {
     /**
      * Returns a Depth-first iterator on the specified graph.
      * Iteration will start at the specified start vertex.
-     * If the specified start vertex is empty, iteration will start at an arbitrary vertex.
      *
      * @param graph  graph to search
-     * @param startVertex vertex to start DFS iteration
-     * @return
+     * @param startVertex vertex from which to start DFS iteration
+     * @param isCrossComponent is the traverse cross-component
+     * @param <V> type of vertex object in the graph
+     * @param <E> type of edge object in the graph
+     * @return Iterator object whose order of enumeration is some dfs traversal of the graph, starting from startVertex
+     *
      * @throws IllegalArgumentException if the graph does not contain the specified start vertex
      */
     private static <V, E> Iterator<V> dfs(DirectedGraph<V, E> graph, V startVertex, boolean isCrossComponent) {
@@ -30,13 +33,17 @@ public class GraphTraverse {
     }
 
     /**
+     * Returns a Depth-first iterator on the specified graph.
      * The search will not be limited to the connected component that includes the specified start vertex,
      * that is, will be able to traverse all the graph.
      *
      * @param graph  graph to search
-     * @param startVertex  vertex to start traversal from
-     * @return
+     * @param startVertex  vertex to start DFS traversal from
+     * @param <V> type of vertex object in the graph
+     * @param <E> type of edge object in the graph
+     * @return Iterator object whose order of enumeration is some dfs traversal of the graph, starting from startVertex
      *
+     * @throws IllegalArgumentException if the graph does not contain the specified start vertex
      * @see #dfs(DirectedGraph, Object, boolean)
      */
     public static <V, E> Iterator<V> dfsCrossComponent(DirectedGraph<V, E> graph, V startVertex) {
@@ -44,14 +51,14 @@ public class GraphTraverse {
     }
 
     /**
+     * Returns a Depth-first iterator on the specified graph.
      * The search will be limited to the connected component that includes the specified start vertex
-     * (or an arbitrary vertex if not specified).
      *
-     * @param graph
-     * @param startVertex
-     * @param <V>
-     * @param <E>
-     * @return
+     * @param graph  graph to search
+     * @param startVertex  vertex to start DFS traversal from
+     * @param <V> type of vertex object in the graph
+     * @param <E> type of edge object in the graph
+     * @return Iterator object whose order of enumeration is some dfs traversal of the graph, starting from startVertex
      *
      * @see #dfs(DirectedGraph, Object, boolean)
      */
@@ -62,10 +69,13 @@ public class GraphTraverse {
     /**
      * Returns a Breadth-first iterator on the specified graph.
      * Iteration will start at the specified start vertex.
-     * If the specified start vertex is empty, iteration will start at an arbitrary vertex.
      *
-     * @param graph       graph to search
+     * @param graph  graph to search
      * @param startVertex vertex to start DFS iteration
+     * @param <V> type of vertex object in the graph
+     * @param <E> type of edge object in the graph
+     * @return Iterator object whose order of enumeration is some bfs traversal of the graph, starting from startVertex
+     *
      * @throws IllegalArgumentException if the graph does not contain the specified start vertex
      */
     private static <V, E> Iterator<V> bfs(DirectedGraph<V, E> graph, V startVertex, boolean isCrossComponent) {
@@ -75,15 +85,18 @@ public class GraphTraverse {
     }
 
     /**
-     * he search will not be limited to the connected component that includes the specified start vertex,
+     * Returns a Breadth-first iterator on the specified graph.
+     * Iteration will start at the specified start vertex.
+     * The search will not be limited to the connected component that includes the specified start vertex,
      * that is, will be able to traverse all the graph.
      *
-     * @param graph
-     * @param startVertex
-     * @param <V>
-     * @param <E>
-     * @return
+     * @param graph  graph to search
+     * @param startVertex vertex to start BFS iteration
+     * @param <V> type of vertex object in the graph
+     * @param <E> type of edge object in the graph
+     * @return Iterator object whose order of enumeration is some bfs traversal of the graph, starting from startVertex
      *
+     * @throws IllegalArgumentException if the graph does not contain the specified start vertex
      * @see #bfs(DirectedGraph, Object, boolean)
      */
     public static <V, E> Iterator<V> bfsCrossComponent(DirectedGraph<V, E> graph, V startVertex) {
@@ -91,20 +104,18 @@ public class GraphTraverse {
     }
 
     /**
+     * Returns a Breadth-first iterator on the specified graph.
+     * The search will be limited to the connected component that includes the specified start vertex.
      *
-     * The search will be limited to the connected component that includes the specified start vertex
-     *  (or an arbitrary vertex if not specified).
-     *
-     * @param graph
-     * @param startVertex
-     * @param <V>
-     * @param <E>
-     * @return
+     * @param graph  graph to search
+     * @param startVertex vertex to start BFS iteration
+     * @param <V> type of vertex object in the graph
+     * @param <E> type of edge object in the graph
+     * @return Iterator object whose order of enumeration is some bfs traversal of the graph, starting from startVertex
      *
      * @see #bfs(DirectedGraph, Object, boolean)
      */
     public static <V, E> Iterator<V> bfsSingleComponent(DirectedGraph<V, E> graph, V startVertex) {
         return bfs(graph, startVertex, false);
     }
-
 }

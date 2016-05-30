@@ -27,11 +27,13 @@ import java.util.stream.Collectors;
 public class GraphUtils {
 
     /**
-     * Performs topological sort on DirectedGraph
+     * Performs topological sort on {@link DirectedGraph}
      *
      * @param graph graph on which topological sort will be applied
-     * @return Optional Iterator whose order of iteration is graph's topological sort
-     * OR Optional.empty if there is no valid sort
+     * @param <V> type of vertex object in the graph
+     * @param <E> type of edge object in the graph
+     * @return Optional Iterator whose order of iteration is graph's topological sort OR Optional.empty
+     * if there is no valid sort
      */
 
     public static <V, E> Optional<Iterator<V>> toposort(DirectedGraph<V, E> graph) {
@@ -42,6 +44,8 @@ public class GraphUtils {
      * Checks whether a given {@link DirectedGraph} has a cycle
      *
      * @param graph graph
+     * @param <V> type of vertex object in the graph
+     * @param <E> type of edge object in the graph
      * @return true iff graph has cycle
      */
     public static <V, E> boolean hasCycle(DirectedGraph<V, E> graph) {
@@ -49,10 +53,12 @@ public class GraphUtils {
     }
 
     /**
-     * Get all sources of a {@link DirectedGraph} - all vertices with no incoming edges
+     * Get all sources of a {@link DirectedGraph} - that is, all vertices with no incoming edges.
      *
      * @param graph - graph to search
-     * @return - set of sources in the received graph
+     * @param <V> type of vertex object in the graph
+     * @param <E> type of edge object in the graph
+     * @return  set of sources in the received graph
      */
     public static <V, E> Set<V> getSourcesVertices(DirectedGraph<V, E> graph) {
         return graph.vertexSet().stream()
@@ -61,10 +67,12 @@ public class GraphUtils {
     }
 
     /**
-     * Get all leaves of a {@link DirectedGraph} - all vertices with no outgoing edges
+     * Get all leaves of a {@link DirectedGraph} - that is, all vertices with no outgoing edges
      *
      * @param graph - graph to search
-     * @return - set of leaves in the received graph
+     * @param <V> type of vertex object in the graph
+     * @param <E> type of edge object in the graph
+     * @return  set of leaves in the received graph
      */
     public static <V, E> Set<V> getLeafVertices(DirectedGraph<V, E> graph) {
         return graph.vertexSet().stream()
@@ -75,10 +83,16 @@ public class GraphUtils {
     /**
      * Returns all vertices that satisfy a given predicate, for instance :
      * <br>
-     * {@code getVerticesThat(graph, v -> graph.outDegreeOf(v) == 0) is equivalent to getLeafVertices(graph)}
+     * <code> getVerticesThat(graph, v -> graph.outDegreeOf(v) == 0) </code>
+     * <br>
+     * is equivalent to:
+     * <br> <code>getLeafVertices(graph)</code>
+     *
      * @param graph the graph to operate on
-     * @param predicate predicate on vertices
-     * @return -
+     * @param predicate predicate condition on vertices
+     * @param <V> type of vertex object in the graph
+     * @param <E> type of edge object in the graph
+     * @return set of vertices satisfying the given predicate in the  graph
      */
     public static <V, E> Set<V> getVerticesSuchThat(DirectedGraph<V, E> graph, Predicate<V> predicate) {
         return graph.vertexSet().stream()
@@ -86,12 +100,14 @@ public class GraphUtils {
                 .collect(Collectors.toSet());
     }
 
-
     /**
      * Get all reachable vertices from a specified source vertex in a {@link DirectedGraph}.
      *
      * @param graph  the graph to search
      * @param source source vertex
+     * @param <V> type of vertex object in the graph
+     * @param <E> type of edge object in the graph
+     * @return Set ov vertices reachable from source in the graph
      * @throws IllegalArgumentException if the graph does not contain the specified start vertex
      */
     public static <V, E> Set<V> getAllReachableVerticesFromSource(DirectedGraph<V, E> graph, V source) {
