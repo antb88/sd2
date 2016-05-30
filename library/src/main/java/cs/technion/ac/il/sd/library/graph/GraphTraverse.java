@@ -7,7 +7,10 @@ import org.jgrapht.traverse.DepthFirstIterator;
 import java.util.Iterator;
 
 /**
- * {@link GraphUtils}
+ *  Extension of {@link GraphUtils} graph library, focusing on different iterators\traversals on {@link DirectedGraph}.
+ *  Traversals can be both cross-component (in case the graph is not connected) as well as single-component,
+ *  in which case the result of the traversed set of vertices will depend on the start vertex.
+ *
  */
 public class GraphTraverse {
     /**
@@ -15,8 +18,9 @@ public class GraphTraverse {
      * Iteration will start at the specified start vertex.
      * If the specified start vertex is empty, iteration will start at an arbitrary vertex.
      *
-     * @param graph       graph to search
+     * @param graph  graph to search
      * @param startVertex vertex to start DFS iteration
+     * @return
      * @throws IllegalArgumentException if the graph does not contain the specified start vertex
      */
     private static <V, E> Iterator<V> dfs(DirectedGraph<V, E> graph, V startVertex, boolean isCrossComponent) {
@@ -29,10 +33,8 @@ public class GraphTraverse {
      * The search will not be limited to the connected component that includes the specified start vertex,
      * that is, will be able to traverse all the graph.
      *
-     * @param graph
-     * @param startVertex
-     * @param <V>
-     * @param <E>
+     * @param graph  graph to search
+     * @param startVertex  vertex to start traversal from
      * @return
      *
      * @see #dfs(DirectedGraph, Object, boolean)
