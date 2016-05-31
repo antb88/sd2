@@ -167,4 +167,16 @@ public class ManagerAppTest {
         order.verify(mock).run(eq("a"), eq(6), eq(5), eq(5), anyObject());
         order.verifyNoMoreInteractions();
     }
+
+    @Test
+    public void chainsIsCorrect() throws InterruptedException
+    {
+        processFile("chains");
+        InOrder order = inOrder(mock);
+        for(int i = 1; i <= 4; i++)
+        {
+            order.verify(mock,times(4)).run(anyString(), eq(1), eq(1), eq(i), anyObject());
+        }
+        order.verifyNoMoreInteractions();
+    }
 }

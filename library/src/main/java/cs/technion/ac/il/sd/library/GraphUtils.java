@@ -1,4 +1,4 @@
-package cs.technion.ac.il.sd.library.graph;
+package cs.technion.ac.il.sd.library;
 
 import com.google.common.collect.Sets;
 import org.jgrapht.DirectedGraph;
@@ -12,7 +12,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
- * GraphUtils and GraphTraverse library based on underlying JGraphT graph library (http://jgrapht.org, http://jgrapht.org/javadoc).
+ * cs.technion.ac.il.sd.library.GraphUtils and cs.technion.ac.il.sd.library.GraphTraverse library based on underlying JGraphT graph library (http://jgrapht.org, http://jgrapht.org/javadoc).
  * <br> Library contains graph iterators such as : topological sort, bfs, dfs along with utility functions such as getting
  * all vertices that satisfy a condition, all leafs, all sources etc'
  * <br> <br> We chose to support mainly DirectedGraph as a graph because of the nature of the assignments,

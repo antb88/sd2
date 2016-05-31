@@ -1,4 +1,4 @@
-package cs.technion.ac.il.sd.library.graph;
+package cs.technion.ac.il.sd.library;
 
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.traverse.BreadthFirstIterator;

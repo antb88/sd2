@@ -1,6 +1,6 @@
 import com.google.common.collect.Lists;
-import cs.technion.ac.il.sd.library.graph.GraphTraverse;
-import cs.technion.ac.il.sd.library.graph.GraphUtils;
+import cs.technion.ac.il.sd.library.GraphTraverse;
+import cs.technion.ac.il.sd.library.GraphUtils;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.experimental.dag.DirectedAcyclicGraph;
 import org.jgrapht.graph.DefaultDirectedGraph;
