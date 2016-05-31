@@ -134,6 +134,12 @@ public class ManagerAppTest {
         Thread.sleep(300);
         verify(mock).fail();
     }
+    @Test
+    public void insufficientResourcesFails() throws InterruptedException {
+        processFile("insufficientResources");
+        Thread.sleep(300);
+        verify(mock).fail();
+    }
 
     @Test
     public void largeIsCorrect() throws InterruptedException
@@ -147,5 +153,18 @@ public class ManagerAppTest {
         }
         order.verifyNoMoreInteractions();
 
+    }
+
+    @Test
+    public void greedyIsCorrect() throws InterruptedException {
+        processFile("greedy");
+        Thread.sleep(300);
+        InOrder order = inOrder(mock);
+        order.verify(mock).run(eq("e"), eq(5), eq(5), eq(5), anyObject());
+        order.verify(mock).run(eq("d"), eq(6), eq(4), eq(4), anyObject());
+        order.verify(mock).run(eq("b"), eq(5), eq(6), eq(5), anyObject());
+        order.verify(mock).run(eq("c"), eq(5), eq(5), eq(6), anyObject());
+        order.verify(mock).run(eq("a"), eq(6), eq(5), eq(5), anyObject());
+        order.verifyNoMoreInteractions();
     }
 }
